@@ -1,17 +1,17 @@
 # Writing the Bitflags Macro
 
-As you may recall from the previous chapter, we used a proc-macro that was called `bitfields`. In this chapter, we are going to learn about Rust's procedural macros and even implement one ourselves.
+As you may recall from the previous chapter, we used a proc-macro called `bitfields`. In this chapter, we are going to learn about Rust's procedural macros and even implement one ourselves.
 
-> Another great resource for this subject is the great video [Comprehending Proc Macros](https://youtu.be/SMCRQj9Hbx8?si=p-JUX0rLronBG_Nz) by Logan Smith
+> Another great resource for this subject is the great video [Comprehending Proc Macros](https://youtu.be/SMCRQj9Hbx8?si=p-JUX0rLronBG_Nz) by Logan Smith.
 
 
-_If you are familiar with procedural macros, `syn` and `quote`, and want to go straight to the macro implementation, click [here](#defining-our-macro)_
+_If you are familiar with procedural macros, `syn` and `quote`, you may go straight to the [macro implementation](#defining-our-macro)_
 
 ## A Little Introduction to Procedural Macros
 
 Macros are not a new idea in programming languages, and most languages have them in some form. But what even is a macro?
 
-If you ask Wikipedia, we get the following definition. 
+If you ask Wikipedia, we get the following definition:
 ### [_Macro_](https://en.wikipedia.org/wiki/Macro_(computer_science))
 <div style="border-left: 3px solid #ccc; padding-left: 12px;">
 
@@ -19,17 +19,17 @@ _A macro is a rule or pattern that specifies how a certain input should be mappe
 
 </div>
 
-When I read this definition, the first thing that comes to mind is that it really sounds like a function. After all, a function maps the input arguments to the output arguments, which is exactly what a macro does. And that is exactly right. Rust, macros (specifically procedural macros), are indeed a specific type of function, but let's not get ahead of ourselves.
+When I read this definition, the first thing that comes to mind is that it really sounds like a function. After all, a function maps the input arguments to the output arguments, which is exactly what a macro does. And that is exactly right. Rust macros (specifically procedural macros), are indeed a specific type of function, but let's not get ahead of ourselves.
 
 The key differences between macros and regular functions are that macros _replace_ the inputs and the outputs, and that is not always true with functions. Secondly, macros operate on our source code instead of variables in our program.
 
-Rust takes this definition very literally, and the definition for a proc-macro function looks like this: 
+Rust takes this definition very literally. The definition for a proc-macro function looks like this: 
 
 ```rust
 #![function!("snippets/src/lib.rs", custom_proc_macro)]
 ```
 
-As you can see in this function, the input is Rust's `TokenStream`, which is literally our source code, and the output is also a `TokenStream,` which means it expects us to return also source code, which could be the same (Like the example above), but most of the time it is not.
+As you can see in this function, the input is Rust's `TokenStream`, which is literally our source code, and the output is also a `TokenStream,` which means it expects us to return source code, which could be the same as the input (like the example above), but most of the time it is not.
 
 But what is this `TokenStream`? Why not just use strings of the source code?
 
