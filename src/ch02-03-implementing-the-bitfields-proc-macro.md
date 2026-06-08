@@ -84,7 +84,7 @@ _Can you understand the name of the struct and its fields?_
 
 As you may have noticed, macros do not behave exactly like regular functions. Another difference that they have is that they are evaluated at compile time. 
 
-This thinking can also be used on regular functions, but not from our point of view, but from the compiler's point of view. For the compiler, regular functions are also a mapping, from some target language (in our case, Rust) to some other target language (in most cases, ASM[^1]).
+This thinking can also be used on regular functions. From the compiler's point of view, regular functions are also a mapping, from some source language (in our case, Rust) to some other target language (in most cases, ASM[^1]).
 
 For example, this function: 
 
@@ -104,7 +104,7 @@ square:
   ret
 ```
 
-From this point of view, macros are not so different, but instead of a target language, they are mapped to the same language.
+From this point of view, macros are not so different, but instead of a target language, they are mapped to the same source language.
 So this macro:
 
 ```rust
@@ -132,7 +132,7 @@ It works because it injects the `break` expression into the code at the call sit
 #![function!("snippets/src/book/ch02_03/general.rs", unwrap_or_break)]
 ```
 
-At this time, I hope you understand the great power of macros, and the great [code generation](https://en.wikipedia.org/wiki/Code_generation) capabilities that they enable. But, you might think rightfully think that in the examples above, we didn't have the option to insert 'coding' logic into the macro expansion. This is where procedural macros come in.
+At this point, I hope you understand the great power of macros, and the great [code generation](https://en.wikipedia.org/wiki/Code_generation) capabilities that they enable. But, you might have noticed that in the examples above, we didn't have the option to insert 'coding' logic into the macro expansion. This is where procedural macros come in.
 
 [^1]: This is actually a simplified view; compilers have intermediate representations. These representations are really useful but out of the scope of this book. If you are like me, and this really interests you, I will drop a great blog post that gives an example of why the intermediate representations are useful. [From Rust to Reality: The Hidden Journey of fetch_max](https://questdb.com/blog/rust-fetch-max-compiler-journey/)
 
@@ -164,7 +164,7 @@ The common types of metavariables are:
 2. **Expressions ($e:expr)** => Expressions are things that are evaluated to a value, like `1 + 2` or `foo.bar()`.
 3. **Items ($i:item)** => Items are the components of a module, for example the entire definition of a function or a struct.
 4. **Statements ($s:stmt)** => Statements are the individual lines of code that make up a function or block. For example, `let x = 42;` is a statement.
-5. **Blocks ($b:block)** => Blocks are groups of statements that are executed on the same scope. For example, `{ let y = 33; let x = 7 + y; x }` is a block.
+5. **Blocks ($b:block)** => Blocks are groups of statements that are executed in the same scope. For example, `{ let y = 33; let x = 7 + y; x }` is a block.
 
 _For a full list of available metavariable types, see the [reference](https://doc.rust-lang.org/reference/macros-by-example.html#r-macro.decl.meta.specifier)_
 
@@ -173,14 +173,14 @@ _For a full list of available metavariable types, see the [reference](https://do
 
 Now for the real deal. Procedural macros give us the ability to go beyond simple syntax extensions and allow us to write custom Rust code that will run at compile time on the macro input to consume and produce new Rust syntax (Depending on the macro type, the returned syntax will replace the input syntax or will be added to it).
 
-Because procedural macros are another piece of code that will run at compile time, they cannot be defined in the same crate as the code that uses them. This is because the Rust compiler must initially compile the code of the macro so it will be able to run it during the compilation process. In addition, each proc macro crate must add the following configuration to its `Cargo.toml` file, which will tell Cargo that this is a proc macro crate.
+Because procedural macros are implemented using Rust code instead of pattern matching, they cannot be defined in the same crate as the code that uses them. This is because the Rust compiler must first compile the code of the macro so it will be able to run during the compilation process. In addition, each proc macro crate must add the following configuration to its `Cargo.toml` file, which will tell Cargo that this is a proc macro crate.
 
 ```toml
 [lib]
 proc-macro = true
 ```
 
-Like all functions, these macro functions can also fail, although these functions are allowed to panic. They are encouraged to use the `compile_error!` macro to return a compile-time error instead, which is the compiler form of `panic!`
+Like all functions, these macro functions can also fail. Although these functions are allowed to panic, they are encouraged to use the `compile_error!` macro to return a compile-time error instead, which is the compiler form of `panic!`
 
 To gain the `Tokenstream` type and the attributes that will be used on the macro functions, we will use the `proc_macro` crate, which is automatically linked to our crate if it is a proc macro crate.
 
